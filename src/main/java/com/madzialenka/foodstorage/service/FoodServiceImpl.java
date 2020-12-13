@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @Service
 public class FoodServiceImpl implements FoodService {
 
-    public static final String DEFAULT_SORT_BY = "id";
-    public static final Sort.Direction DEFAULT_SORT_DIRECTION = Sort.Direction.ASC;
+    private static final String DEFAULT_SORT_BY = "id";
+    private static final Sort.Direction DEFAULT_SORT_DIRECTION = Sort.Direction.ASC;
     private final FoodRepository foodRepository;
 
     public FoodServiceImpl(FoodRepository foodRepository) {
