@@ -1,9 +1,12 @@
 package com.madzialenka.foodstorage.service;
 
+import com.madzialenka.foodstorage.api.FoodRequestDTO;
 import com.madzialenka.foodstorage.api.FoodResponseDTO;
+import com.madzialenka.foodstorage.exception.FoodNotFoundException;
 import com.madzialenka.foodstorage.model.Food;
 import com.madzialenka.foodstorage.repository.FoodRepository;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +37,40 @@ public class FoodServiceImpl implements FoodService {
         return allFood.stream()
                 .map(this::mapToFoodResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public FoodResponseDTO addFood(FoodRequestDTO foodRequestDTO) {
+        Food food = new Food();
+        updateFood(food, foodRequestDTO);
+        Food savedFood = foodRepository.save(food);
+        return mapToFoodResponseDTO(savedFood);
+    }
+
+    @Override
+    public FoodResponseDTO updateFood(Long id, FoodRequestDTO foodRequestDTO) {
+        Food foundFood = getFoodById(id);
+        updateFood(foundFood, foodRequestDTO);
+        Food savedFood = foodRepository.save(foundFood);
+        return mapToFoodResponseDTO(savedFood);
+    }
+
+    @Override
+    public FoodResponseDTO deleteFood(Long id) {
+        Food foundFood = getFoodById(id);
+        foodRepository.delete(foundFood);
+        return mapToFoodResponseDTO(foundFood);
+    }
+
+    private Food getFoodById(Long id) {
+        return foodRepository.findById(id).orElseThrow(() -> new FoodNotFoundException(id));
+    }
+
+    private void updateFood(Food food, FoodRequestDTO foodRequestDTO) {
+        food.setName(foodRequestDTO.getName());
+        food.setMeasurementUnit(foodRequestDTO.getMeasurementUnit());
+        food.setAmount(foodRequestDTO.getAmount());
+        food.setBestBefore(foodRequestDTO.getBestBefore());
     }
 
     private FoodResponseDTO mapToFoodResponseDTO(Food food) {
